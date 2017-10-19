@@ -167,6 +167,9 @@ class TensorBase(object):
             if type(pubkey) == syft.he.paillier.keys.PublicKey:
                 out = syft.he.paillier.PaillierTensor(pubkey, self.data)
                 return out
+            elif type(pubkey) == syft.he.bv.keys.PublicKey:
+                out = syft.he.bv.BVTensor(pubkey, self.data)
+                return out
             else:
                 return NotImplemented
 

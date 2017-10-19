@@ -13,7 +13,7 @@ class BVTensor(TensorBase):
         self.public_key = public_key
 
         if(type(data) == np.ndarray and input_is_decrypted):
-            self.data = BV.ciphertext(data.tolist(), self.public_key.pk)
+            self.data = self.public_key.encrypt(data, True)
         else:
             self.data = data
 
@@ -122,11 +122,11 @@ class Float():
         self.public_key = public_key
 
         if(data is not None):
-            self.data = self.public_key.pk.encrypt(data)
+            self.data = BV.ciphertext(data, public_key.pk)
         else:
             self.data = None
 
-    def reencypt(self):
+    def reencrypt(self):
         # TODO replace with deevashwer's clever new HE algo
         # "Cleaning" controls the noise that will otherwise grow with successive multiplications
         # NB: Not yet implemented

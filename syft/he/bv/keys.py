@@ -18,7 +18,6 @@ class SecretKey(AbstractSecretKey):
     def decrypt(self, x):
         """Decrypts x. X can be either an encrypted int or a numpy
         vector/matrix/tensor."""
-
         if(type(x) == Float):
             return self.sk.decrypt(x.data)
         elif(type(x) == TensorBase or type(x) == BVTensor):
@@ -30,11 +29,12 @@ class SecretKey(AbstractSecretKey):
             sh = x.shape
             x_ = x.reshape(-1)
             out = list()
+
             for v in x_:
-                out.append(self.sk.decrypt(v.data))
+                out.append(v.data.decrypt(self.sk))
             return np.array(out).reshape(sh)
-        else:
-            return NotImplemented
+        elif type(x) == BV.ciphertext:
+            return TensorBase(x.decrypt(self.sk), encrypted=False)
 
     def serialize(self):
         # TODO
@@ -83,12 +83,15 @@ class PublicKey(AbstractPublicKey):
             sh = x.shape
             x_ = x.reshape(-1)
             out = list()
+
             for v in x_:
+                if type(v) == np.int64:
+                    v = int(v)
                 out.append(Float(self, v))
             if(same_type):
                 return np.array(out).reshape(sh)
             else:
-                return BVTensor(self, np.array(out).reshape(sh))
+                return BVTensor(self, np.array(out).reshape(sh), False)
         else:
             print("format not recognized:" + str(type(x)))
             return NotImplemented
